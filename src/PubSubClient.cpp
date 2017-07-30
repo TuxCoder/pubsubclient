@@ -117,10 +117,14 @@ boolean PubSubClient::connect(const char *id, const char *user, const char *pass
     if (!connected()) {
         int result = 0;
 
-        if (domain != NULL) {
-            result = _client->connect(this->domain, this->port);
+        if(_client->connected()){
+            result = 1;
         } else {
-            result = _client->connect(this->ip, this->port);
+            if (domain != NULL) {
+                result = _client->connect(this->domain, this->port);
+            } else {
+                result = _client->connect(this->ip, this->port);
+            }
         }
         if (result == 1) {
             nextMsgId = 1;
@@ -547,7 +551,7 @@ boolean PubSubClient::connected() {
             }
         }
     }
-    return rc;
+    return rc && this->_state == MQTT_CONNECTED;
 }
 
 PubSubClient& PubSubClient::setServer(uint8_t * ip, uint16_t port) {
